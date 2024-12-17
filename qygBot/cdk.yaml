@@ -1,0 +1,9 @@
+time:
+  updateTime: "2024-12-17 14:00:00(UTC+8)"
+  expireTime: "2024-12-18 12:00:00(UTC+8)"
+
+content: [
+  "CDK1",
+  "CDK2",
+  "CDK3",
+]
