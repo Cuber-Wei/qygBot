@@ -6,7 +6,7 @@ import botpy
 from botpy import logging
 from botpy.ext.cog_yaml import read
 from botpy.ext.command_util import Commands
-from botpy.message import Message, GroupMessage, C2CMessage
+from botpy.message import Message, GroupMessage, C2CMessage, DirectMessage
 
 test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 _log = logging.get_logger()
@@ -183,13 +183,41 @@ class MyClient(botpy.Client):
 
         await message.reply(content="该指令不在功能内！")
 
+    async def on_direct_message_create(self, message: DirectMessage):
+        _log.info(message)
+
+        handler = [self.menu, self.routes]
+        for handle_func in handler:
+            if await handle_func(message=message):
+                return
+
+        param = message.content.split(" ")[-1]
+        res = await self.get_route_query_reply(param)
+
+        if res[0]:
+            # 查询到项目
+            if res[1]['des']:
+                # 有描述，发送描述
+                await message.reply(content=f'{res[1]["des"]}')
+            # 发送图片
+            if res[1]['pics']:
+                # 有后缀，发送图片
+                for pic in res[1]['pics']:
+                    _log.info(f"图片路径: {pic}")
+                    try:
+                        _log.info(f"图片路径: {pic}")
+                        await message.reply(image=pic)
+                    except:
+                        _log.info("图片上传失败！")
+                        await message.reply(content="图片上传失败！")
+
+            return
+
+        await message.reply(content="该指令不在功能内！")
+
 
 if __name__ == "__main__":
-    # 通过预设置的类型，设置需要监听的事件通道
-    # intents = botpy.Intents.none()
-    # intents.public_guild_messages=True
-    #
     # 通过kwargs，设置需要监听的事件通道
-    intents = botpy.Intents(public_guild_messages=True, public_messages=True)
+    intents = botpy.Intents(direct_message=True, public_guild_messages=True, public_messages=True)
     client = MyClient(intents=intents, is_sandbox=True)
     client.run(appid=test_config["appid"], secret=test_config["secret"])
