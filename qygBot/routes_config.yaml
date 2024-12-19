@@ -1,25 +1,12 @@
-史莱姆:
-  suffix: ["-小怪.jpeg", "-收益.jpeg"]
-  des: []
-  alias: ["史莱姆"]
 弓萨:
-  suffix: ["a.jpeg"]
+  url: ["http://pic.l0v3ch4n.top/%E6%80%AA%E7%89%A9%E8%B7%AF%E7%BA%BF/%E5%BC%93%E8%90%A8a.jpg"]
   des: []
-  alias: ["弓萨", "弓萨a", "萨满"]
+  alias: ["弓萨", "弓萨a"]
 镜讨萤:
-  suffix: [".jpg"]
+  url: ["http://pic.l0v3ch4n.top/%E6%80%AA%E7%89%A9%E8%B7%AF%E7%BA%BF/%E9%95%9C%E8%AE%A8%E8%90%A4.jpg"]
   des: []
   alias: ["镜讨萤", "jty"]
-
-苦种:
-  suffix: [".jpeg"]
+传奇原海:
+  url: ["http://pic.l0v3ch4n.top/%E6%80%AA%E7%89%A9%E8%B7%AF%E7%BA%BF/%E4%BC%A0%E5%A5%87%E5%8E%9F%E6%B5%B7.jpg"]
   des: []
-  alias: ["苦种"]
-枯叶紫英:
-  suffix: []
-  des: "枯叶紫英7分钟70个\nb站视频号：BV1ELSTYSEi1"
-  alias: ["枯叶紫英"]
-青蜜莓:
-  suffix: [".png"]
-  des: "两分半66+18个青蜜莓\nb站视频号：BV19cBFYdEBJ"
-  alias: ["青蜜莓"]
+  alias: ["传奇原海", "传原", "原海"]

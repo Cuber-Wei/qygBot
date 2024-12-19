@@ -6,7 +6,7 @@ import botpy
 from botpy import logging
 from botpy.ext.cog_yaml import read
 from botpy.ext.command_util import Commands
-from botpy.message import Message
+from botpy.message import Message, GroupMessage, C2CMessage
 
 test_config = read(os.path.join(os.path.dirname(__file__), "config.yaml"))
 _log = logging.get_logger()
@@ -52,7 +52,7 @@ class MyClient(botpy.Client):
                     status = True
                     res['name'] = key
                     res['des'] = value['des']
-                    res['pics'] = [key + suffix for suffix in value['suffix']]
+                    res['pics'] = value['url']
                     break
 
         return status, res
@@ -85,8 +85,100 @@ class MyClient(botpy.Client):
             if res[1]['pics']:
                 # 有后缀，发送图片
                 for pic in res[1]['pics']:
-                    _log.info(f"图片路径: pics/{pic}")
-                    await message.reply(file_image="pics/" + pic)
+                    try:
+                        _log.info(f"图片路径: {pic}")
+                        await message.reply(image=pic)
+                    except:
+                        _log.info("图片上传失败！")
+                        await message.reply(content="图片上传失败！")
+            return
+
+        await message.reply(content="该指令不在功能内！")
+
+    async def on_group_at_message_create(self, message: GroupMessage):
+        _log.info(message)
+
+        handler = [self.menu, self.routes]
+        for handle_func in handler:
+            if await handle_func(message=message):
+                return
+
+        param = message.content.split(" ")[-1]
+        res = await self.get_route_query_reply(param)
+
+        if res[0]:
+            # 查询到项目
+            if res[1]['des']:
+                # 有描述，发送描述
+                await message.reply(content=f'{res[1]["des"]}')
+            # 发送图片
+            if res[1]['pics']:
+                # 有后缀，发送图片
+                for pic in res[1]['pics']:
+                    _log.info(f"图片路径: {pic}")
+                    file_url = pic  # 这里需要填写上传的资源Url
+                    try:
+                        uploadMedia = await message._api.post_group_file(
+                            group_openid=message.group_openid,
+                            file_type=1,  # 文件类型要对应上，具体支持的类型见方法说明
+                            url=file_url,
+                        )
+
+                        # 资源上传后，会得到Media，用于发送消息
+                        await message._api.post_group_message(
+                            group_openid=message.group_openid,
+                            msg_type=7,  # 7表示富媒体类型
+                            msg_id=message.id,
+                            media=uploadMedia
+                        )
+                    except:
+                        _log.info("图片上传失败！")
+                        await message.reply(content="图片上传失败！")
+
+            return
+
+        await message.reply(content="该指令不在功能内！")
+
+    async def on_c2c_message_create(self, message: C2CMessage):
+        _log.info(message)
+
+        handler = [self.menu, self.routes]
+        for handle_func in handler:
+            if await handle_func(message=message):
+                return
+
+        param = message.content.split(" ")[-1]
+        res = await self.get_route_query_reply(param)
+
+        if res[0]:
+            # 查询到项目
+            if res[1]['des']:
+                # 有描述，发送描述
+                await message.reply(content=f'{res[1]["des"]}')
+            # 发送图片
+            if res[1]['pics']:
+                # 有后缀，发送图片
+                for pic in res[1]['pics']:
+                    _log.info(f"图片路径: {pic}")
+                    file_url = pic  # 这里需要填写上传的资源Url
+                    try:
+                        uploadMedia = await message._api.post_c2c_file(
+                            openid=message.author.user_openid,
+                            file_type=1,  # 文件类型要对应上，具体支持的类型见方法说明
+                            url=file_url  # 文件Url
+                        )
+
+                        # 资源上传后，会得到Media，用于发送消息
+                        await message._api.post_c2c_message(
+                            openid=message.author.user_openid,
+                            msg_type=7,  # 7表示富媒体类型
+                            msg_id=message.id,
+                            media=uploadMedia
+                        )
+                    except:
+                        _log.info("图片上传失败！")
+                        await message.reply(content="图片上传失败！")
+
             return
 
         await message.reply(content="该指令不在功能内！")
@@ -98,6 +190,6 @@ if __name__ == "__main__":
     # intents.public_guild_messages=True
     #
     # 通过kwargs，设置需要监听的事件通道
-    intents = botpy.Intents(public_guild_messages=True)
+    intents = botpy.Intents(public_guild_messages=True, public_messages=True)
     client = MyClient(intents=intents, is_sandbox=True)
     client.run(appid=test_config["appid"], secret=test_config["secret"])
